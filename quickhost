@@ -1,0 +1,56 @@
+#!/usr/local/bin/php
+
+<?php
+// I require them SUDO access
+// `sudo make sammich.make`
+
+if ($argc > 1) {
+  $name = $argv[1];
+  $root = getcwd();
+
+  $script_dir = dirname(realpath($_SERVER['PHP_SELF']));
+  $settings = parse_ini_file($script_dir . '/quickhost.ini');
+
+  $conf_fname = "/$name.conf";
+  $available_file = $settings['sites_available'] . $conf_fname;
+  $enabled_file = $settings['sites_enabled'] . $conf_fname;
+
+  // Get conf output
+  ob_start();
+  include $settings['config_template'];
+  $conf_output = ob_get_contents();
+  ob_end_clean();
+
+  // Create file in sites-available
+  $available_host = fopen($available_file, 'w+');
+  fwrite($available_host, $conf_output);
+  fflush($available_host);
+  fclose($available_host);
+
+  // Create symbolic link in sites-enabled
+  $sym_result = symlink($available_file, $enabled_file);
+  if (!$sym_result) {
+    echo 'Could not create Symlink from sites-available to sites-enabled';
+  } else {
+    echo 'Created Symlink from sites-available to sites-enabled';
+  }
+
+  // Create entry in hosts
+  $hosts = fopen($settings['hosts'], 'a+');
+  $current_line = fgets($hosts);
+  if (!empty($current_line)) {
+    fwrite($hosts, PHP_EOL);
+  }
+  fwrite($hosts, "127.0.0.1\t{$name}" . PHP_EOL);
+  fflush($hosts);
+  fclose($hosts);
+  
+  // Let's restart apache then
+  `apachectl restart`;
+  
+} else {
+  
+  echo 'I need a name for the site!';
+  
+}
+
