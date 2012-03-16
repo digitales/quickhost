@@ -1,4 +1,4 @@
-#!/usr/local/bin/php
+#!/usr/bin/php
 
 <?php
 // I require them SUDO access
@@ -8,7 +8,7 @@ if ($argc > 1) {
   $name = $argv[1];
   $root = getcwd();
 
-  $script_dir = dirname(realpath($_SERVER['PHP_SELF']));
+  $script_dir = dirname(realpath($_SERVER['PHP_SELF'])) . '/quickhost_lib';
   $settings = parse_ini_file($script_dir . '/quickhost.ini');
 
   $conf_fname = "/$name.conf";
@@ -17,7 +17,7 @@ if ($argc > 1) {
 
   // Get conf output
   ob_start();
-  include $settings['config_template'];
+  include $script_dir . '/' . $settings['config_template'];
   $conf_output = ob_get_contents();
   ob_end_clean();
 
@@ -38,9 +38,6 @@ if ($argc > 1) {
   // Create entry in hosts
   $hosts = fopen($settings['hosts'], 'a+');
   $current_line = fgets($hosts);
-  if (!empty($current_line)) {
-    fwrite($hosts, PHP_EOL);
-  }
   fwrite($hosts, "127.0.0.1\t{$name}" . PHP_EOL);
   fflush($hosts);
   fclose($hosts);
