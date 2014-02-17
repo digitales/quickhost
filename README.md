@@ -8,4 +8,4 @@ A note on Apache setup: we assume, and sincerely hope, you've setup Apache with 
 To install Quickhost, run the following command:
 
 
-sudo cd /usr/local/bin && sudo git clone git://github.com/digitales/quickhost.git quickhost_files && sudo mv quickhost_files/* . && sudo rm -Rf quickhost_files
+`sudo cd /usr/local/bin && sudo git clone git://github.com/digitales/quickhost.git quickhost_files && sudo mv quickhost_files/* . && sudo rm -Rf quickhost_files`
